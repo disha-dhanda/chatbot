@@ -1,0 +1,234 @@
+/* ---------- GLOBAL ---------- */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #e6f0fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* ---------- CHAT UI ---------- */
+.chat-container {
+    background-color: white;
+    width: 420px;
+    height: 620px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.chat-header {
+    background-color: #4a90e2;
+    padding: 20px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.chat-subtext {
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.chat-box,
+.chatbox {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Chat messages */
+.message {
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 1s ease forwards;
+}
+
+.message.bot {
+    align-self: flex-start;
+    background-color: #e6e6fa;
+    color: #333;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: #d2f8d2;
+    color: #222;
+}
+
+/* Chat input area */
+form {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 12px 15px;
+    background-color: #fff;
+}
+
+form input[type="text"] {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 20px;
+    outline: none;
+}
+
+form button[type="submit"] {
+    margin-left: 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #3b7ccc;
+}
+
+/* Scroll button (optional) */
+#scroll-btn {
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: opacity 0.3s ease;
+}
+
+#scroll-btn:hover {
+    background-color: #3b7ccc;
+}
+
+/* Logout button */
+.logout-container {
+    text-align: center;
+    padding: 12px;
+    border-top: 1px solid #eee;
+    background-color: #fff;
+}
+
+.logout-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #cc0000;
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- AUTH PAGES ---------- */
+.auth-body {
+    background-color: #eaf4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.auth-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    text-align: center;
+}
+
+.auth-container h2 {
+    margin-bottom: 1.5rem;
+    color: #003366;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-form button:hover {
+    background-color: #0055aa;
+}
+
+.auth-container p {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.auth-container a {
+    color: #663399;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
+}
+
+.flash-messages {
+    list-style: none;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    color: red;
+    font-weight: bold;
+}
