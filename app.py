@@ -1,89 +1,94 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
-from werkzeug.security import generate_password_hash, check_password_hash
 
-# --- Database setup ---
+app = Flask(__name__)
+app.secret_key = "supersecretkey"
+
+# Ensure DB exists
 def init_db():
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute('''
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
+            username TEXT UNIQUE,
+            password TEXT
         )
-    ''')
+    """)
     conn.commit()
     conn.close()
 
-# --- Flask Setup ---
-app = Flask(__name__)
-app.secret_key = 'supersecretkey'
 init_db()
 
-# --- Routes ---
-
-@app.route('/')
+@app.route("/")
 def home():
-    return redirect(url_for('login'))
+    if "user" in session:
+        return redirect(url_for("chat"))
+    return redirect(url_for("login"))
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        conn = sqlite3.connect('users.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE email = ?", (email,))
-        user = c.fetchone()
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+        user = cursor.fetchone()
         conn.close()
 
-        if user and check_password_hash(user[3], password):
-            session['user'] = user[1]  # username
-            return redirect(url_for('chat'))
+        if user:
+            session["user"] = username
+            return redirect(url_for("chat"))
         else:
-            flash("Invalid credentials or account doesn't exist. Please sign up.")
-            return redirect(url_for('login'))
+            return render_template("login.html", error="Invalid username or password. Please sign up first.")
 
-    return render_template('login.html')
+    return render_template("login.html")
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = generate_password_hash(request.form.get('password'))
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        conn = sqlite3.connect('users.db')
-        c = conn.cursor()
         try:
-            c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                      (username, email, password))
+            conn = sqlite3.connect("users.db")
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
             conn.commit()
-        except sqlite3.IntegrityError:
-            flash("Email is already registered. Please log in.")
-            return redirect(url_for('signup'))
-        finally:
             conn.close()
+            return redirect(url_for("login"))
+        except:
+            return render_template("signup.html", error="Username already exists.")
 
-        session['user'] = username
-        return redirect(url_for('chat'))
+    return render_template("signup.html")
 
-    return render_template('signup.html')
-
-@app.route('/chat')
+@app.route("/chat")
 def chat():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('chat.html', user=session['user'])
+    if "user" not in session:
+        return redirect(url_for("login"))
+    return render_template("chat.html")
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
-    session.pop('user', None)
-    return redirect(url_for('login'))
+    session.pop("user", None)
+    return redirect(url_for("login"))
 
-# --- Run ---
-if __name__ == '__main__':
+@app.route("/get_response", methods=["POST"])
+def get_response():
+    user_message = request.json.get("message", "")
+    
+    # Simple chatbot replies
+    if "hello" in user_message.lower():
+        bot_reply = "Hi there! How can I help you today?"
+    elif "bye" in user_message.lower():
+        bot_reply = "Goodbye! Have a great day!"
+    else:
+        bot_reply = "I'm just a simple chatbot for now 😊"
+
+    return jsonify({"response": bot_reply})
+
+if __name__ == "__main__":
     app.run(debug=True)
+

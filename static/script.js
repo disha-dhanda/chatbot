@@ -1,48 +1,44 @@
 function sendMessage() {
-    const userInputField = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
-    const userInput = userInputField.value.trim();
+    let input = document.getElementById("user-input");
+    let message = input.value.trim();
+    if (message === "") return;
 
-    if (userInput === "") return;
+    let chatBox = document.getElementById("chat-messages");
+    chatBox.innerHTML += `<div class="message user">${message}</div>`;
+    input.value = "";
 
-    // Display user message
-    const userMessage = document.createElement("div");
-    userMessage.className = "message user";
-    userMessage.innerText = userInput;
-    chatBox.appendChild(userMessage);
-    scrollToBottom();
-
-    // Send to Flask backend
-    fetch("/chat", {
+    fetch("/get_response", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: userInput })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        const botMessage = document.createElement("div");
-        botMessage.className = "message bot";
-        botMessage.innerText = data.response;
-        chatBox.appendChild(botMessage);
+        chatBox.innerHTML += `<div class="message bot">${data.response}</div>`;
         scrollToBottom();
     });
-
-    userInputField.value = "";
 }
 
 function scrollToBottom() {
-    const chatBox = document.getElementById("chat-box");
+    let chatBox = document.getElementById("chat-messages");
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-const scrollBtn = document.getElementById("scroll-btn");
-const chatBox = document.getElementById("chat-box");
-
-chatBox.addEventListener("scroll", () => {
-    const atBottom = chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 10;
-    scrollBtn.style.display = atBottom ? "none" : "block";
+// Enter key = send
+document.getElementById("user-input").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+    }
 });
 
-scrollBtn.addEventListener("click", scrollToBottom);
+// Scroll button toggle
+let chatMessages = document.getElementById("chat-messages");
+chatMessages.addEventListener("scroll", function() {
+    let btn = document.getElementById("scroll-btn");
+    if (chatMessages.scrollTop < chatMessages.scrollHeight - chatMessages.clientHeight - 50) {
+        btn.style.display = "block";
+    } else {
+        btn.style.display = "none";
+    }
+});
